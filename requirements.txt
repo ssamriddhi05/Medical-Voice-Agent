@@ -1,0 +1,10 @@
+streamlit
+langchain
+langchain-openrouter
+python-dotenv
+openai-whisper
+edge-tts
+sounddevice
+scipy
+numpy
+nest-asyncio

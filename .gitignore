@@ -1,0 +1,4 @@
+.env
+medical_question.wav
+medical_response.mp3
+__pycache__/
