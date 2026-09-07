@@ -1,7 +1,8 @@
 import streamlit as st
 
 from medical_agent import ask_medical_agent
-from speech import record_audio, speech_to_text
+from speech import save_audio, speech_to_text
+# from speech import record_audio, speech_to_text
 from tts import text_to_speech
 
 
@@ -416,57 +417,45 @@ else:
     <h3>🎙️ Speak your question</h3>
 
     <p>
-    Click the button below and speak clearly.
+    Record your medical question using your microphone.
     </p>
 
     </div>
     """, unsafe_allow_html=True)
 
 
-    duration = st.slider(
-        "Recording duration",
-        min_value=3,
-        max_value=15,
-        value=7
+    # =====================================================
+    # BROWSER AUDIO RECORDER
+    # =====================================================
+
+    audio_data = st.audio_input(
+        "🎙️ Record your medical question"
     )
 
 
-    if st.button(
-        "🎙️ Start Recording",
-        use_container_width=True
-    ):
+    if audio_data is not None:
 
-        # =============================================
-        # RECORDING
-        # =============================================
+        st.success("✅ Recording completed!")
 
-        with st.spinner(
-            "🎤 Listening..."
-        ):
-
-            audio_file = record_audio(
-                duration=duration
-            )
-
-
-        st.success(
-            "✅ Recording completed!"
-        )
-
-
+        # Play recorded audio
         st.audio(
-            audio_file,
+            audio_data,
             format="audio/wav"
         )
 
 
-        # =============================================
-        # SPEECH TO TEXT
-        # =============================================
+        # =================================================
+        # SAVE AUDIO
+        # =================================================
 
         with st.spinner(
             "🔄 Understanding your speech..."
         ):
+
+            audio_file = save_audio(
+                audio_data.getvalue()
+            )
+
 
             question = speech_to_text(
                 audio_file
@@ -572,8 +561,7 @@ else:
                     "TTS ERROR:",
                     str(e)
                 )
-
-
+                
 # =========================================================
 # DISCLAIMER
 # =========================================================
