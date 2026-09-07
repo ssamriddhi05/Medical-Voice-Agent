@@ -1,59 +1,55 @@
-import sounddevice as sd
-import scipy.io.wavfile as wav
-import numpy as np
 import whisper
+import tempfile
+import os
 
 
-# -----------------------------
-# Load Whisper
-# -----------------------------
+# =========================================================
+# LOAD WHISPER MODEL
+# =========================================================
 
 whisper_model = whisper.load_model("base")
 
 
-# -----------------------------
-# Record Audio
-# -----------------------------
+# =========================================================
+# SAVE BROWSER AUDIO
+# =========================================================
 
-def record_audio(
-    filename="medical_question.wav",
-    duration=7,
-    sample_rate=16000
-):
+def save_audio(audio_bytes):
+    """
+    Saves audio bytes received from Streamlit
+    into a temporary WAV file.
+    """
 
-    print("Recording...")
-
-    audio = sd.rec(
-        int(duration * sample_rate),
-        samplerate=sample_rate,
-        channels=1,
-        dtype="float32"
+    temp_file = tempfile.NamedTemporaryFile(
+        delete=False,
+        suffix=".wav"
     )
 
-    sd.wait()
+    temp_file.write(audio_bytes)
+    temp_file.close()
 
-    audio = np.squeeze(audio)
-
-    wav.write(
-        filename,
-        sample_rate,
-        audio
-    )
-
-    return filename
+    return temp_file.name
 
 
-# -----------------------------
-# Speech To Text
-# -----------------------------
+# =========================================================
+# SPEECH TO TEXT
+# =========================================================
 
-def speech_to_text(filename):
+def speech_to_text(audio_file):
 
-    result = whisper_model.transcribe(
-        filename,
-        fp16=False
-    )
+    try:
 
-    text = result["text"].strip()
+        result = whisper_model.transcribe(
+            audio_file,
+            fp16=False
+        )
 
-    return text
+        text = result["text"].strip()
+
+        return text
+
+    finally:
+
+        # Delete temporary audio file
+        if os.path.exists(audio_file):
+            os.remove(audio_file)
