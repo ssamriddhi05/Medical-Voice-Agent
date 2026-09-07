@@ -5,22 +5,42 @@ from langchain_openrouter import ChatOpenRouter
 from langchain_core.tools import tool
 from langchain.agents import create_agent
 
+
+# =========================================================
+# LOAD ENVIRONMENT VARIABLES
+# =========================================================
+
 load_dotenv()
 
-# -----------------------------
-# OpenRouter Model
-# -----------------------------
+
+# =========================================================
+# OPENROUTER API KEY
+# =========================================================
+
+api_key = os.getenv("OPENROUTER_API_KEY")
+
+if not api_key:
+    raise ValueError(
+        "OPENROUTER_API_KEY is not set. "
+        "Please add it to your Streamlit Cloud Secrets."
+    )
+
+
+# =========================================================
+# OPENROUTER MODEL
+# =========================================================
 
 model = ChatOpenRouter(
     model="openai/gpt-5-mini",
     temperature=0,
-    max_tokens=1000
+    max_tokens=1000,
+    api_key=api_key
 )
 
 
-# -----------------------------
-# Medical Information Tool
-# -----------------------------
+# =========================================================
+# MEDICAL INFORMATION TOOL
+# =========================================================
 
 @tool
 def medical_information(query: str) -> str:
@@ -141,9 +161,9 @@ def medical_information(query: str) -> str:
     """
 
 
-# -----------------------------
-# Medical Agent
-# -----------------------------
+# =========================================================
+# MEDICAL AGENT
+# =========================================================
 
 medical_agent = create_agent(
     model=model,
@@ -176,9 +196,9 @@ medical_agent = create_agent(
 )
 
 
-# -----------------------------
-# Ask Agent
-# -----------------------------
+# =========================================================
+# ASK MEDICAL AGENT
+# =========================================================
 
 def ask_medical_agent(question):
 
